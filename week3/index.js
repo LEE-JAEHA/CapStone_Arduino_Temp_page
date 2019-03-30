@@ -1,5 +1,5 @@
-var express = require('express');
 var fs = require('fs');
+var express = require('express');
 var date = require('date-and-time');
 var app = express();
 var mysql = require('mysql');
@@ -30,9 +30,13 @@ app.get('/log', function(req,res){
 	now = date.addHours(now,9);
 	console.log(date.format(now,"YYYY/MM/DD/HH/mm/ss"));
 	var querydata = {};
-	querydata.time = now;
-	querydata.value = req.query.temp;
-	sql = "insert into capstone set ?";
+	querydata.daytime = now;
+	querydata.temper = req.query.temp;
+	
+	sql = "insert into capstone2 set ?";
+	console.log("\n\n");
+	console.log(querydata);
+	console.log("\n\n");
 	connection.query(sql,querydata, (err, rows, fields) => {
 		if(err){
 			console.log(err);
@@ -45,7 +49,7 @@ app.get('/log', function(req,res){
 app.get('/graph', function(req,res){
 	console.log("HI");
 	console.log(req.query);
-	var sql = "select time_t temper from capstone order by time_t DESC limit 120;"	
+	var sql = "select daytime temper from capstone2 order by daytime DESC limit 120;"	
 	connection.query(sql, (err, rows, fields) => {
 		if(err){
 			console.log("   \n");
@@ -110,4 +114,3 @@ app.get('/graph', (req,res)=>{
 });
 */
 
-ar express = require('express');
