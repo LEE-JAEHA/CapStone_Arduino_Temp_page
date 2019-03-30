@@ -1,0 +1,13 @@
+module.js:478
+    throw err;
+    ^
+
+Error: Cannot find module '/home/ubuntu/CapStone_Arduino_Temp_page/week3/server.js'
+    at Function.Module._resolveFilename (module.js:476:15)
+    at Function.Module._load (module.js:424:25)
+    at Module.runMain (module.js:611:10)
+    at run (bootstrap_node.js:394:7)
+    at startup (bootstrap_node.js:160:9)
+    at bootstrap_node.js:507:3
+npm ERR! missing script: start
+npm ERR! missing script: start
