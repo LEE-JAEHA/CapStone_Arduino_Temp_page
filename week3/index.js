@@ -4,6 +4,8 @@ var date = require('date-and-time');
 var app = express();
 var mysql = require('mysql');
 var d3 = require("d3");
+var moment = require('moment');
+var now = moment();
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 app.set('view engine', 'pug');
@@ -47,35 +49,41 @@ app.get('/log', function(req,res){
 });
 
 app.get('/graph', function(req,res){
-	console.log("HI");
-	console.log(req.query);
-	var sql = "select daytime temper from capstone2 order by daytime DESC limit 120;"	
-	connection.query(sql, (err, rows, fields) => {
-		if(err){
-			console.log("   \n");
-			console.log(err);
-			throw err;
-		}
-		console.log("this is \n\n");
-		console.log(rows);
-		console.log("hihihih\n\n");
-		var arrsize = rows.length;
-		for(var i=0;i<arrsize;i++){
-			if(i==arrsize-1) 
-				max = rows[i].time;
-			if(i==0) 
-				min = rows[i].time;
-		}
-		res.render('graph',{'result' : rows, 'min' : min, 'max' : max});
-		//result에 row의 데이터를 보낸다.
-		//console.log(min,max);
-	})
+	console.log("graph=" + req.query);
+	var html = fs.readFile('./views/graph.html',function(err,html){
+		var qstr = 'select * from capstone2 order by daytime';
+		html = " "+html
+		console.log('read end');
+		connection.query(qstr, function(err, rows, cols) {
+			if (err) {
+				res.send('query error: '+ qstr);
+				throw err;
+			}
+			var data = "";
+			var comma = "";
+			for ( var i = 0 ; i < rows.length ; i++){
+				r = rows[i];
+				now = moment(rows[i].daytime).add(9,'hours').add(-1,'month');
+				data += comma + "[new Date(" + now.format('YYYY,MM,DD,HH,mm') + ",)," + r.temper + "]";
+				comma = ",";
+			}
+			var header = "data.addColumn('date', 'Date/Time');"
+			header += "data.addColumn('number', 'Temperature');"
+			html = html.replace("<%HEADER%>",header);
+			html = html.replace("<%DATA%>",data);
+			res.writeHeader(200, {"Content-Type": "text/html"});
+			res.write(html);
+			res.end();
+		});
+	});
 });
 
 
 
-app.listen(3000, function () {
-		console.log('Example app listening on port 3000!\n');
+var server = app.listen(3000, function () {
+	var host = server.address().address
+	var port = server.address().port
+	console.log('listening at http://%s:%s', host, port);  
 });
 
 /*
