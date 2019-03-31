@@ -6,19 +6,19 @@ var mysql = require('mysql');
 var d3 = require("d3");
 var moment = require('moment');
 var now = moment();
+var secure = require("./jaehalee.js");
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({extended: false}));
 app.set('view engine', 'pug');
 app.set("views", "./views");
 
-var connection = mysql.createConnection({
-	host : "jaehalee.cwys1zlqyezi.ap-northeast-2.rds.amazonaws.com",
-	user : "jaehalee",
-	password : "jaeha30739",
-	database : "jaehalee"
-})
-connection.connect();
 
+
+
+
+
+var connection = mysql.createConnection(secure);
+connection.connect();
 app.engine('html',require('ejs').renderFile);
 
 app.get('/', function (req, res) {
@@ -61,8 +61,14 @@ app.get('/graph', function(req,res){
 			}
 			var data = "";
 			var comma = "";
+			var start = rows[0].daytime;
+			var end = rows[rows.length-1].daytime;
 			for ( var i = 0 ; i < rows.length ; i++){
 				r = rows[i];
+				if(rows[i].temper>max)
+					max = rows[i].temper;
+				if(rows[i].temper<min)
+					min = rows[i].temper;
 				now = moment(rows[i].daytime).add(9,'hours').add(-1,'month');
 				data += comma + "[new Date(" + now.format('YYYY,MM,DD,HH,mm') + ",)," + r.temper + "]";
 				comma = ",";
